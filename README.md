@@ -1,21 +1,22 @@
-# trivy-plugin-template
+# trivy-plugin-ubuntu-severity
 Template for Trivy plugins
 
-**NOTE: Replace <org_name>, <repository_name> and <plugin_name> in go.mod, goreleaser.yaml and plugin.yaml with the appropriate values.**
 
 ## Installation
 ```shell
-trivy plugin install github.com/<org_name>/<repository_name>
+trivy plugin install github.com/mlathara/trivy-plugin-ubuntu-severity
 ```
 
 ## Usage
 
 ```shell
-trivy image --format json --output plugin=<plugin_name> [--output-plugin-arg plugin_flags] <image_name>
+trivy image --format json --output plugin=ubuntu-severity [--output-plugin-arg --severity CRTIICAL --output-plugin-arg --severity-sources ubuntu] <image_name>
 ```
 
 OR
 
 ```shell
-trivy image -f json <image_name> | trivy <plugin_name> [plugin_flags]
+trivy image -f json <image_name> | trivy ubuntu-severity [--severity CRITICAL --severity-sources ubuntu]
 ```
+
+This plugin aims to upgrade severities based on CVSS base score. However, it is not clear if this is what is we want -- the main motivation was to try and match what Azure Defender for Cloud was calling out as high or critical vulnerabilities. Even after adding `--ignore-unfixed` it seems like this approach results in more CVEs than we get from Azure Defender.

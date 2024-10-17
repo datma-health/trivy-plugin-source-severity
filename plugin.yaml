@@ -1,27 +1,28 @@
-name: <plugin_name>
-repository: github.com/<org_name>/<repository_name>
+name: ubuntu-severity
+repository: github.com/mlathara/trivy-plugin-ubuntu-severity
 version: "0.1.0"
 usage: Template
+output: True
 description: |-
-  A plugin template
+  Plugin that takes image scan output and upgrades Ubuntu severity using CVSS
 platforms:
   - selector:
       os: darwin
       arch: amd64
-    uri: https://github.com/<org_name>/<repository_name>/releases/download/v0.1.0/<repository_name>_0.1.0_darwin-amd64.tar.gz
-    bin: ./<plugin_name>
+    uri: https://github.com/mlathara/trivy-plugin-ubuntu-severity/releases/download/v0.1.0/trivy-plugin-ubuntu-severity_0.1.0_darwin-amd64.tar.gz
+    bin: ./ubuntu-severity
   - selector:
       os: darwin
       arch: arm64
-    uri: https://github.com/<org_name>/<repository_name>/releases/download/v0.1.0/<repository_name>_0.1.0_darwin-arm64.tar.gz
-    bin: ./<plugin_name>
+    uri: /tmp/ubuntu.tar.gz
+    bin: ./ubuntu-severity
   - selector:
       os: linux
       arch: amd64
-    uri: https://github.com/<org_name>/<repository_name>/releases/download/v0.1.0/<repository_name>_0.1.0_linux-amd64.tar.gz
-    bin: ./<plugin_name>
+    uri: https://github.com/mlathara/trivy-plugin-ubuntu-severity/releases/download/v0.1.0/trivy-plugin-ubuntu-severity_0.1.0_linux-amd64.tar.gz
+    bin: ./ubuntu-severity
   - selector:
       os: linux
       arch: arm64
-    uri: https://github.com/<org_name>/<repository_name>/releases/download/v0.1.0/<repository_name>_0.1.0_linux-arm64.tar.gz
-    bin: ./<plugin_name>
+    uri: https://github.com/mlathara/trivy-plugin-ubuntu-severity/releases/download/v0.1.0/trivy-plugin-ubuntu-severity_0.1.0_linux-arm64.tar.gz
+    bin: ./ubuntu-severity
