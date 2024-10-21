@@ -10,7 +10,7 @@ trivy plugin install github.com/mlathara/trivy-plugin-ubuntu-severity
 ## Usage
 
 ```shell
-trivy image --format json --output plugin=ubuntu-severity [--output-plugin-arg --severity CRTIICAL --output-plugin-arg --severity-sources ubuntu] <image_name>
+trivy image --format json --output plugin=ubuntu-severity [--output-plugin-arg "--severity=CRTIICAL --severity-sources=ubuntu"] <image_name>
 ```
 
 OR

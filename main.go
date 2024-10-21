@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"flag"
+	"fmt"
 	"log"
 	"os"
 	"slices"
@@ -53,12 +54,13 @@ func run() error {
 	}
 	severitySources := strings.Split(*severitySourcesFlag, ",")
 
+	var detected bool
 	for i, result := range report.Results {
+		var filteredVulnerability []types.DetectedVulnerability
 		for j, vuln := range result.Vulnerabilities {
 			if !slices.Contains(severitySources, string(vuln.SeveritySource)) {
 				continue
 			}
-			log.Printf("Checking CVE: %s for pkgId: %s to see if severity needs to be updated", vuln.VulnerabilityID, vuln.PkgID)
 
 			var severity dbTypes.Severity = dbTypes.SeverityUnknown
 			if cvss, ok := vuln.CVSS["nvd"]; ok {
@@ -74,17 +76,61 @@ func run() error {
 
 			if vulnSeverity, err := dbTypes.NewSeverity(vuln.Severity); err == nil {
 				if vulnSeverity < severity {
-					log.Printf("Updating severity for %s from %s to %s", vuln.VulnerabilityID, vulnSeverity.String(), severity.String())
+					fmt.Printf("Updating severity for %s from %s to %s\n", vuln.VulnerabilityID, vulnSeverity.String(), severity.String())
 					report.Results[i].Vulnerabilities[j].Severity = severity.String()
 				}
 			}
+
+			if vulnSeverity, err := dbTypes.NewSeverity(report.Results[i].Vulnerabilities[j].Severity); err == nil {
+				if slices.Contains(severities, vulnSeverity) {
+					filteredVulnerability = append(filteredVulnerability, report.Results[i].Vulnerabilities[j])
+					detected = true
+				}
+			}
 		}
+		report.Results[i].Vulnerabilities = filteredVulnerability
+
+		var filteredSecrets []types.DetectedSecret
+		for _, secret := range result.Secrets {
+			if vulnSeverity, err := dbTypes.NewSeverity(secret.Severity); err == nil {
+				if slices.Contains(severities, vulnSeverity) {
+					filteredSecrets = append(filteredSecrets, secret)
+					detected = true
+				}
+			}
+		}
+		report.Results[i].Secrets = filteredSecrets
+
+		var filteredLicenses []types.DetectedLicense
+		for _, license := range result.Licenses {
+			if vulnSeverity, err := dbTypes.NewSeverity(license.Severity); err == nil {
+				if slices.Contains(severities, vulnSeverity) {
+					filteredLicenses = append(filteredLicenses, license)
+					detected = true
+				}
+			}
+		}
+		report.Results[i].Licenses = filteredLicenses
+
+		var filteredMisconfs []types.DetectedMisconfiguration
+		for _, misconf := range result.Misconfigurations {
+			if vulnSeverity, err := dbTypes.NewSeverity(misconf.Severity); err == nil {
+				if slices.Contains(severities, vulnSeverity) {
+					filteredMisconfs = append(filteredMisconfs, misconf)
+					detected = true
+				}
+			}
+		}
+		report.Results[i].Misconfigurations = filteredMisconfs
 	}
 
 	writer := pkgReport.Writer{Output: os.Stdout, Severities: severities}
 	err := writer.Write(context.TODO(), report)
 	if err != nil {
 		return err
+	}
+	if detected {
+		return fmt.Errorf("plugin detected vulnerabilities")
 	}
 	return nil
 }
