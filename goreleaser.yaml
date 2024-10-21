@@ -1,4 +1,4 @@
-project_name: trivy-plugin-source-severity
+project_name: source-severity
 builds:
   -
     main: .
