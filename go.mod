@@ -1,4 +1,4 @@
-module github.com/mlathara/trivy-plugin-ubuntu-severity
+module github.com/datma-health/trivy-plugin-source-severity
 
 go 1.23.2
 

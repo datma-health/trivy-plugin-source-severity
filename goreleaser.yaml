@@ -1,4 +1,4 @@
-project_name: trivy-plugin-ubuntu-severity
+project_name: trivy-plugin-source-severity
 builds:
   -
     main: .

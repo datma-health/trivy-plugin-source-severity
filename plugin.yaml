@@ -1,5 +1,5 @@
-name: ubuntu-severity
-repository: github.com/mlathara/trivy-plugin-ubuntu-severity
+name: source-severity
+repository: github.com/datma-health/trivy-plugin-source-severity
 version: "0.1.0"
 usage: Template
 output: True
@@ -9,20 +9,20 @@ platforms:
   - selector:
       os: darwin
       arch: amd64
-    uri: https://github.com/mlathara/trivy-plugin-ubuntu-severity/releases/download/v0.1.0/trivy-plugin-ubuntu-severity_0.1.0_darwin-amd64.tar.gz
-    bin: ./ubuntu-severity
+    uri: https://github.com/datma-health/trivy-plugin-source-severity/releases/download/v0.1.0/trivy-plugin-source-severity_0.1.0_darwin-amd64.tar.gz
+    bin: ./source-severity
   - selector:
       os: darwin
       arch: arm64
-    uri: /tmp/ubuntu.tar.gz
-    bin: ./ubuntu-severity
+    uri: https://github.com/datma-health/trivy-plugin-source-severity/releases/download/v0.1.0/trivy-plugin-source-severity_0.1.0_darwin-arm64.tar.gz
+    bin: ./source-severity
   - selector:
       os: linux
       arch: amd64
-    uri: https://github.com/mlathara/trivy-plugin-ubuntu-severity/releases/download/v0.1.0/trivy-plugin-ubuntu-severity_0.1.0_linux-amd64.tar.gz
-    bin: ./ubuntu-severity
+    uri: https://github.com/datma-health/trivy-plugin-source-severity/releases/download/v0.1.0/trivy-plugin-source-severity_0.1.0_linux-amd64.tar.gz
+    bin: ./source-severity
   - selector:
       os: linux
       arch: arm64
-    uri: https://github.com/mlathara/trivy-plugin-ubuntu-severity/releases/download/v0.1.0/trivy-plugin-ubuntu-severity_0.1.0_linux-arm64.tar.gz
-    bin: ./ubuntu-severity
+    uri: https://github.com/datma-health/trivy-plugin-source-severity/releases/download/v0.1.0/trivy-plugin-source-severity_0.1.0_linux-arm64.tar.gz
+    bin: ./source-severity
