@@ -2,7 +2,7 @@ project_name: source-severity
 builds:
   -
     main: .
-    binary: 
+    binary: source-severity
     ldflags:
       - -s -w
       - "-extldflags '-static'"
