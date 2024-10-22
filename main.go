@@ -58,26 +58,24 @@ func run() error {
 	for i, result := range report.Results {
 		var filteredVulnerability []types.DetectedVulnerability
 		for j, vuln := range result.Vulnerabilities {
-			if !slices.Contains(severitySources, string(vuln.SeveritySource)) {
-				continue
-			}
-
-			var severity dbTypes.Severity = dbTypes.SeverityUnknown
-			if cvss, ok := vuln.CVSS["nvd"]; ok {
-				severity = getSeverity(cvss)
-			} else if cvss, ok := vuln.CVSS["ghsa"]; ok {
-				severity = getSeverity(cvss)
-			} else {
-				for k := range vuln.CVSS {
-					severity = getSeverity(vuln.CVSS[k])
-					break
+			if slices.Contains(severitySources, string(vuln.SeveritySource)) {
+				var severity dbTypes.Severity = dbTypes.SeverityUnknown
+				if cvss, ok := vuln.CVSS["nvd"]; ok {
+					severity = getSeverity(cvss)
+				} else if cvss, ok := vuln.CVSS["ghsa"]; ok {
+					severity = getSeverity(cvss)
+				} else {
+					for k := range vuln.CVSS {
+						severity = getSeverity(vuln.CVSS[k])
+						break
+					}
 				}
-			}
 
-			if vulnSeverity, err := dbTypes.NewSeverity(vuln.Severity); err == nil {
-				if vulnSeverity < severity {
-					fmt.Printf("Updating severity for %s from %s to %s\n", vuln.VulnerabilityID, vulnSeverity.String(), severity.String())
-					report.Results[i].Vulnerabilities[j].Severity = severity.String()
+				if vulnSeverity, err := dbTypes.NewSeverity(vuln.Severity); err == nil {
+					if vulnSeverity < severity {
+						fmt.Printf("Updating severity for %s from %s to %s\n", vuln.VulnerabilityID, vulnSeverity.String(), severity.String())
+						report.Results[i].Vulnerabilities[j].Severity = severity.String()
+					}
 				}
 			}
 
