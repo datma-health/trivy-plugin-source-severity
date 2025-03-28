@@ -17,7 +17,7 @@ import (
 
 func main() {
 	if err := run(); err != nil {
-		log.Fatal(err)
+		log.Fatal(fmt.Errorf("main.run() failure %w", err))
 	}
 }
 
@@ -39,7 +39,7 @@ func run() error {
 	// First we read Stdin to avoid Trivy freezing if we get an error
 	var report types.Report
 	if err := json.NewDecoder(os.Stdin).Decode(&report); err != nil {
-		return err
+		return fmt.Errorf("json.NewDecoder failure %w", err)
 	}
 
 	severityFlag := flag.String("severity", "HIGH,CRITICAL", "comma-separated severity levels to include in final report")
@@ -123,10 +123,10 @@ func run() error {
 	}
 
 	writer := pkgReport.Writer{Output: os.Stdout, Severities: severities}
-	err := writer.Write(context.TODO(), report)
-	if err != nil {
-		return err
+	if err := writer.Write(context.TODO(), report); err != nil {
+		return fmt.Errorf("writer.Write failure %w", err)
 	}
+
 	if detected {
 		return fmt.Errorf("plugin detected vulnerabilities")
 	}
