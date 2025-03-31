@@ -36,12 +36,11 @@ func getSeverity(cvss dbTypes.CVSS) dbTypes.Severity {
 }
 
 func run() error {
-	// Initialize report variable
+	// First we read Stdin to avoid Trivy freezing if we get an error
 	var report types.Report
 	if err := json.NewDecoder(os.Stdin).Decode(&report); err != nil {
 		return fmt.Errorf("json.NewDecoder failure %w", err)
 	}
-	log.Printf("report %v", report)
 
 	severityFlag := flag.String("severity", "HIGH,CRITICAL", "comma-separated severity levels to include in final report")
 	severitySourcesFlag := flag.String("severity-sources", "ubuntu", "comma-separated vuln. sources where we attempt to update severity based on CVSS")
