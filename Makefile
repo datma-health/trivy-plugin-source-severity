@@ -8,3 +8,6 @@ build:
 
 tarball: build
 	tar czvf source-severity.tar.gz plugin.yaml source-severity
+
+test: 
+	go test .

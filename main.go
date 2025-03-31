@@ -54,7 +54,7 @@ func run() error {
 	}
 	severitySources := strings.Split(*severitySourcesFlag, ",")
 
-	var detected bool
+	var detected int
 	for i, result := range report.Results {
 		var filteredVulnerability []types.DetectedVulnerability
 		for j, vuln := range result.Vulnerabilities {
@@ -82,7 +82,7 @@ func run() error {
 			if vulnSeverity, err := dbTypes.NewSeverity(report.Results[i].Vulnerabilities[j].Severity); err == nil {
 				if slices.Contains(severities, vulnSeverity) {
 					filteredVulnerability = append(filteredVulnerability, report.Results[i].Vulnerabilities[j])
-					detected = true
+					detected += 1
 				}
 			}
 		}
@@ -93,7 +93,7 @@ func run() error {
 			if vulnSeverity, err := dbTypes.NewSeverity(secret.Severity); err == nil {
 				if slices.Contains(severities, vulnSeverity) {
 					filteredSecrets = append(filteredSecrets, secret)
-					detected = true
+					detected += 1
 				}
 			}
 		}
@@ -104,7 +104,7 @@ func run() error {
 			if vulnSeverity, err := dbTypes.NewSeverity(license.Severity); err == nil {
 				if slices.Contains(severities, vulnSeverity) {
 					filteredLicenses = append(filteredLicenses, license)
-					detected = true
+					detected += 1
 				}
 			}
 		}
@@ -115,7 +115,7 @@ func run() error {
 			if vulnSeverity, err := dbTypes.NewSeverity(misconf.Severity); err == nil {
 				if slices.Contains(severities, vulnSeverity) {
 					filteredMisconfs = append(filteredMisconfs, misconf)
-					detected = true
+					detected += 1
 				}
 			}
 		}
@@ -127,8 +127,6 @@ func run() error {
 		return fmt.Errorf("writer.Write failure %w", err)
 	}
 
-	if detected {
-		return fmt.Errorf("plugin detected vulnerabilities")
-	}
+	log.Printf("Plugin detected %v vulnerabilities", detected)
 	return nil
 }
