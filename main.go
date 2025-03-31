@@ -127,6 +127,8 @@ func run() error {
 		return fmt.Errorf("writer.Write failure %w", err)
 	}
 
-	log.Printf("Plugin detected %v vulnerabilities", detected)
+	if detected > 0 {
+		return fmt.Errorf("plugin detected %v vulnerabilities", detected)
+	}
 	return nil
 }

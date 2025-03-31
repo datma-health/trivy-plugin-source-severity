@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -30,7 +31,9 @@ func TestRunWithStdin(t *testing.T) {
 			os.Stdin = f
 
 			// Run the function
-			if err := run(); err != nil {
+			if err := run(); err == nil {
+				t.Fatalf("test should fail with vuln")
+			} else if !strings.HasPrefix(err.Error(), "plugin detected") {
 				t.Fatalf("test failed with %v", err)
 			}
 		})
