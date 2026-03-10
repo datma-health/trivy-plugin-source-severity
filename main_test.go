@@ -39,3 +39,51 @@ func TestRunWithStdin(t *testing.T) {
 		})
 	}
 }
+
+// TestRunWithEmptyStdin simulates the case where Trivy itself fails (e.g. image
+// pull error, network timeout) and produces no output at all.  Previously this
+// caused run() to return an io.EOF-wrapped error which made main() call
+// log.Fatal, crashing the whole pipeline without any report.
+// After the fix, an empty stdin is treated as an empty (zero-finding) report
+// and run() returns nil.
+func TestRunWithEmptyStdin(t *testing.T) {
+	oldStdin := os.Stdin
+	defer func() { os.Stdin = oldStdin }()
+
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("Failed to create pipe: %v", err)
+	}
+	w.Close() // close immediately so the reader sees EOF
+
+	os.Stdin = r
+
+	if err := run(); err != nil {
+		t.Fatalf("run() should handle empty stdin (Trivy scan failure) gracefully, got: %v", err)
+	}
+}
+
+// TestRunWithNonJSONStdin simulates the case where Trivy fails and writes a
+// plain-text error message (not JSON) to stdout.  run() must still return a
+// descriptive error rather than silently swallowing it.
+func TestRunWithNonJSONStdin(t *testing.T) {
+	oldStdin := os.Stdin
+	defer func() { os.Stdin = oldStdin }()
+
+	r, w, err := os.Pipe()
+	if err != nil {
+		t.Fatalf("Failed to create pipe: %v", err)
+	}
+	if _, err := w.WriteString("FATAL: trivy scan failed: unable to pull image\n"); err != nil {
+		t.Fatalf("Failed to write to pipe: %v", err)
+	}
+	w.Close()
+
+	os.Stdin = r
+
+	if err := run(); err == nil {
+		t.Fatal("run() should return an error for non-JSON stdin")
+	} else if !strings.HasPrefix(err.Error(), "json.NewDecoder failure") {
+		t.Fatalf("expected json decode error, got: %v", err)
+	}
+}

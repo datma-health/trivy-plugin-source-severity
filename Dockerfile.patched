@@ -1,0 +1,5 @@
+# Same base as Dockerfile.vulnerable but applies all available package updates.
+# After apk upgrade the known CVEs in alpine:3.23.3 are resolved, so the plugin
+# should find zero HIGH/CRITICAL findings (exit 0).
+FROM alpine:3.23.3
+RUN apk upgrade --no-cache

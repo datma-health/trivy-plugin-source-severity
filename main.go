@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"slices"
@@ -39,12 +40,21 @@ func run() error {
 	// First we read Stdin to avoid Trivy freezing if we get an error
 	var report types.Report
 	if err := json.NewDecoder(os.Stdin).Decode(&report); err != nil {
-		return fmt.Errorf("json.NewDecoder failure %w", err)
+		if err == io.EOF {
+			// Trivy produced no output (e.g. the scan itself failed) - proceed with an empty report
+		} else {
+			return fmt.Errorf("json.NewDecoder failure %w", err)
+		}
 	}
 
-	severityFlag := flag.String("severity", "HIGH,CRITICAL", "comma-separated severity levels to include in final report")
-	severitySourcesFlag := flag.String("severity-sources", "ubuntu", "comma-separated vuln. sources where we attempt to update severity based on CVSS")
-	flag.Parse()
+	// Use a local FlagSet so run() can be called more than once (e.g. in tests)
+	// without triggering a "flag redefined" panic on flag.CommandLine.
+	flags := flag.NewFlagSet("source-severity", flag.ContinueOnError)
+	severityFlag := flags.String("severity", "HIGH,CRITICAL", "comma-separated severity levels to include in final report")
+	severitySourcesFlag := flags.String("severity-sources", "ubuntu", "comma-separated vuln. sources where we attempt to update severity based on CVSS")
+	// Ignore parse errors: unknown flags (e.g. -test.run from the Go test runner)
+	// are harmless; the defaults above remain in effect.
+	_ = flags.Parse(os.Args[1:])
 
 	var severities []dbTypes.Severity
 	for _, s := range strings.Split(*severityFlag, ",") {

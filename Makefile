@@ -1,4 +1,4 @@
-.PHONY: clean build
+.PHONY: clean build integration-test
 
 clean:
 	rm -rf source-severity source-severity.tar.gz
@@ -11,3 +11,6 @@ tarball: build
 
 test: 
 	go test .
+
+integration-test: build
+	bash scripts/integration-test.sh
