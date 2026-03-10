@@ -44,10 +44,13 @@ jobs:
 
       - name: Install Trivy
         run: |
-          wget -qO trivy.tar.gz \
-            https://github.com/aquasecurity/trivy/releases/download/v0.56.2/trivy_0.56.2_Linux-64bit.tar.gz
-          sudo tar -xzf trivy.tar.gz -C /usr/local/bin trivy
-          rm trivy.tar.gz
+          sudo apt-get install -y gnupg
+          curl -fsSL https://aquasecurity.github.io/trivy-repo/deb/public.key \
+            | gpg --dearmor \
+            | sudo tee /usr/share/keyrings/trivy.gpg > /dev/null
+          echo "deb [signed-by=/usr/share/keyrings/trivy.gpg] https://aquasecurity.github.io/trivy-repo/deb generic main" \
+            | sudo tee /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update && sudo apt-get install -y trivy
           trivy --version
 
       - name: Run integration test
