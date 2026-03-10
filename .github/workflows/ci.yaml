@@ -44,8 +44,11 @@ jobs:
 
       - name: Install Trivy
         run: |
-          curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh \
-            | sh -s -- -b /usr/local/bin v0.56.2
+          wget -qO trivy.tar.gz \
+            https://github.com/aquasecurity/trivy/releases/download/v0.56.2/trivy_0.56.2_Linux-64bit.tar.gz
+          sudo tar -xzf trivy.tar.gz -C /usr/local/bin trivy
+          rm trivy.tar.gz
+          trivy --version
 
       - name: Run integration test
         run: bash scripts/integration-test.sh
